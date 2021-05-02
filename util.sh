@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#
+# @PACKAGE_NAME@
+# Version: @PACKAGE@-@PACKAGE_VERSION@
+# Project: @PACKAGE_URL@
+# Send bug reports to: @PACKAGE_BUGREPORT@
+#
 
 clean_ws() {
 	local in="$*"

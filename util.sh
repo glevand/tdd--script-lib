@@ -31,12 +31,17 @@ substring_ends() {
 
 sec_to_min() {
 	local sec=${1}
-	local min=$(( sec / 60 ))
-	local frac_10=$(( (sec - min * 60) * 10 / 60 ))
-	local frac_100=$(( (sec - min * 60) * 100 / 60 ))
+
+	local min
+	local frac_10
+	local frac_100
+
+	min=$(( sec / 60 ))
+	frac_10=$(( (sec - min * 60) * 10 / 60 ))
+	frac_100=$(( (sec - min * 60) * 100 / 60 ))
 
 	if (( frac_10 != 0 )); then
-		unset frac_10
+		frac_10=''
 	fi
 
 	echo "${min}.${frac_10}${frac_100}"

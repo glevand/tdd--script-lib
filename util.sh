@@ -235,6 +235,20 @@ directory_size_human() {
 	echo "${size%%[[:space:]]*}"
 }
 
+check_exists() {
+	local src="${1}"
+	local msg="${2}"
+	local usage="${3-}"
+
+	if [[ ! -e "${src}" ]]; then
+		echo "${script_name}: ERROR (${FUNCNAME[0]}): ${msg} does not exist: '${src}'" >&2
+		if [[ ${usage} ]]; then
+			usage
+		fi
+		exit 1
+	fi
+}
+
 check_directory() {
 	local src="${1}"
 	local msg="${2}"
@@ -254,7 +268,9 @@ check_file() {
 
 	if [[ ! -f "${src}" ]]; then
 		echo -e "${script_name}: ERROR: File not found${msg}: '${src}'" >&2
-		[[ -z "${usage}" ]] || usage
+		if [[ ${usage} ]]; then
+			usage
+		fi
 		exit 1
 	fi
 }

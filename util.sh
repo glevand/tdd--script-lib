@@ -447,7 +447,7 @@ copy_file() {
 	local src="${1}"
 	local dest="${2}"
 
-	check_file "${src}"
+	check_file "${src}" '' ''
 	cp -f "${src}" "${dest}"
 }
 

@@ -311,6 +311,19 @@ check_if_positive() {
 	fi
 }
 
+check_prog() {
+	local prog="${1}"
+	local result;
+
+	result=0
+	if ! test -x "$(command -v "${prog}")"; then
+		echo "${script_name}: ERROR: Please install '${prog}'." >&2
+		result=1
+	fi
+
+	return ${result}
+}
+
 check_progs() {
 	local progs="${*}"
 	local p;
@@ -318,8 +331,7 @@ check_progs() {
 
 	result=0
 	for p in ${progs}; do
-		if ! test -x "$(command -v "${p}")"; then
-			echo "${script_name}: ERROR: Please install '${p}'." >&2
+		if check_prog "${p}"; then
 			result=1
 		fi
 	done

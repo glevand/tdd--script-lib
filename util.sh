@@ -331,7 +331,7 @@ check_progs() {
 
 	result=0
 	for p in ${progs}; do
-		if check_prog "${p}"; then
+		if ! check_prog "${p}"; then
 			result=1
 		fi
 	done

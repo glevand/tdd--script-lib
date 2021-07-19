@@ -6,6 +6,53 @@
 # Send bug reports to: @PACKAGE_BUGREPORT@
 #
 
+verbose_echo() {
+	local msg="${*}"
+
+	if [[ "${verbose:-}" &&  "${verbose:-}" == 'y' || "${verbose:-}" == '1' ]]; then
+		echo "${msg}"
+		return
+	fi
+
+	if [[ "${quiet:-}" &&  "${quiet:-}" != 'y' && "${quiet:-}" != '1' ]]; then
+		echo "${msg}"
+	fi
+}
+
+verbose_echo_test() {
+	unset verbose
+	verbose_echo 'verbose test: AAA'
+	verbose=''
+	verbose_echo 'verbose test: BBB'
+	verbose=n
+	verbose_echo 'verbose test: CCC'
+	verbose=y
+	verbose_echo 'verbose test: DDD'
+	verbose=0
+	verbose_echo 'verbose test: EEE'
+	verbose=1
+	verbose_echo 'verbose test: FFF'
+	unset verbose
+	echo "verbose, want: DDD, FFF"
+	echo
+
+	unset quiet
+	verbose_echo 'quiet test: GGG'
+	quiet=''
+	verbose_echo 'quiet test: HHH'
+	quiet=n
+	verbose_echo 'quiet test: III'
+	quiet=y
+	verbose_echo 'quiet test: JJJ'
+	quiet=0
+	verbose_echo 'quiet test: KKK'
+	quiet=1
+	verbose_echo 'quiet test: LLL'
+	unset quiet
+	echo "quiet, want: III, KKK"
+	echo
+}
+
 clean_ws() {
 	local in="$*"
 

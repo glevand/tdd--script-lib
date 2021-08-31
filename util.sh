@@ -82,6 +82,56 @@ substring_ends() {
 	[ -z "${string##*${substring}}" ];
 }
 
+sec_to_hour() {
+	local sec=${1}
+
+	local hour
+	local frac_10
+	local frac_100
+
+	hour=$(( sec / 3600 ))
+	frac_10=$(( (sec - hour * 3600) * 10 / 3600 ))
+	frac_100=$(( (sec - hour * 3600) * 100 / 3600 ))
+
+	if (( frac_10 != 0 )); then
+		frac_10=''
+	fi
+
+	echo "${hour}.${frac_10}${frac_100}"
+}
+
+test_sec_to_hour() {
+	local start=${1:-3590}
+	local end=${2:-36037}
+	local enc=${3:-1}
+
+	local failed=''
+
+	for (( sec = start; sec <= end; sec += enc )); do
+		local s2h
+		local bc
+
+		s2h="$(sec_to_hour ${sec})"
+		bc="$(printf "%0.2f\n" "$(bc -l <<< "scale=2; ${sec}/3600")")"
+
+		if [[ "${s2h}" != "${bc}" ]]; then
+			failed=1
+			echo "ERROR: ${sec} sec = ${s2h} (${bc}) hour" >&1
+		else
+			echo "${sec} sec = ${s2h} (${bc}) hour" >&1
+		fi
+	done
+
+	trap - EXIT
+	if [[ ! ${failed} ]]; then
+		echo "test_sec_to_hour: Success."
+		exit 0
+	else
+		echo "test_sec_to_hour: Failed."
+		exit 1
+	fi
+}
+
 sec_to_min() {
 	local sec=${1}
 
@@ -105,8 +155,7 @@ test_sec_to_min() {
 	local end=${2:-500}
 	local enc=${3:-1}
 
-	local failed
-	unset failed
+	local failed=''
 
 	for (( sec = start; sec <= end; sec += enc )); do
 		local s2m

@@ -318,6 +318,11 @@ test_parse_date_iso_8601() {
 directory_size_bytes() {
 	local dir=${1}
 
+	if [[ ! ${dir} ]]; then
+		echo '0'
+		return
+	fi
+
 	local size
 	size="$(du -sb "${dir}")"
 	echo "${size%%[[:space:]]*}"
@@ -352,7 +357,9 @@ check_directory() {
 
 	if [[ ! -d "${src}" ]]; then
 		echo "${script_name}: ERROR (${FUNCNAME[0]}): Directory not found${msg}: '${src}'" >&2
-		[[ -z "${usage}" ]] || usage
+		if [[ ${usage} ]]; then
+			usage
+		fi
 		exit 1
 	fi
 }
@@ -580,12 +587,13 @@ get_user_home() {
 	echo "${result}" | cut -d ':' -f 6
 }
 
-known_arches="arm64 amd64 ppc32 ppc64 ppc64le"
+known_arches="arm32 arm64 amd64 ppc32 ppc64 ppc64le"
 
 get_arch() {
 	local a=${1}
 
 	case "${a}" in
+	arm32|arm)			echo "arm32" ;;
 	arm64|aarch64)			echo "arm64" ;;
 	amd64|x86_64)			echo "amd64" ;;
 	ppc|powerpc|ppc32|powerpc32)	echo "ppc32" ;;
@@ -603,6 +611,7 @@ get_triple() {
 
 	case "${a}" in
 	amd64)		echo "x86_64-linux-gnu" ;;
+	arm32)		echo "arm-linux-gnueabi" ;;
 	arm64)		echo "aarch64-linux-gnu" ;;
 	ppc32)		echo "powerpc-linux-gnu" ;;
 	ppc64)		echo "powerpc64-linux-gnu" ;;
@@ -619,6 +628,7 @@ kernel_arch() {
 
 	case "${a}" in
 	amd64)		echo "x86_64" ;;
+	arm32*)		echo "arm" ;;
 	arm64*)		echo "arm64" ;;
 	ppc*)		echo "powerpc" ;;
 	*)

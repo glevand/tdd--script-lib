@@ -315,7 +315,7 @@ test_parse_date_iso_8601() {
 	parse_date_iso_8601 "2021-01-02 18:16:00 -0800" year month day time
 }
 
-directory_size_bytes() {
+file_size_bytes() {
 	local dir=${1}
 
 	if [[ ! ${dir} ]]; then
@@ -328,7 +328,7 @@ directory_size_bytes() {
 	echo "${size%%[[:space:]]*}"
 }
 
-directory_size_human() {
+file_size_human() {
 	local dir=${1}
 
 	local size

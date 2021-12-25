@@ -54,10 +54,34 @@ verbose_echo_test() {
 }
 
 clean_ws() {
-	local in="$*"
+	local in="${*}"
 
 	shopt -s extglob
-	in="${in//+( )/ }" in="${in# }" in="${in% }"
+
+	in="${in//+( )/ }"
+	in="${in# }"
+	in="${in% }"
+	echo -n "$in"
+}
+
+make_one_line_list() {
+	local in="${*}"
+
+	in="${in//$'\t'/ }"
+	in="${in//$'\n'/}"
+	in="${in# }"
+	in="${in% }"
+
+	echo -n "$in"
+}
+
+make_multi_line_list() {
+	local in="${*}"
+
+	in="${in//$'\t'/  }"
+	in="${in# }"
+	in="${in% }"
+
 	echo -n "$in"
 }
 
@@ -451,7 +475,10 @@ check_pairs () {
 	result=0
 	for key in "${!_check_pairs__pairs[@]}"; do
 		val="${_check_pairs__pairs[${key}]}"
-		[[ ${verbose} ]] && echo "${script_name}: check: '${val}' => '${key}'." >&2
+
+		if [[ ${verbose} ]]; then
+			echo "${script_name}: check: '${val}' => '${key}'." >&2
+		fi
 
 		if [[ ! -e "${val}" ]]; then
 			echo "${script_name}: ERROR: '${val}' not found, please install '${key}'." >&2
@@ -604,6 +631,10 @@ get_arch() {
 		exit 1
 		;;
 	esac
+}
+
+get_host_arch() {
+	get_arch "$(uname -m)"
 }
 
 get_triple() {

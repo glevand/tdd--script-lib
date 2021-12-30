@@ -135,7 +135,7 @@ test_sec_to_hour() {
 		local s2h
 		local bc
 
-		s2h="$(sec_to_hour ${sec})"
+		s2h="$(sec_to_hour "${sec}")"
 		bc="$(printf "%0.2f\n" "$(bc -l <<< "scale=2; ${sec}/3600")")"
 
 		if [[ "${s2h}" != "${bc}" ]]; then
@@ -185,7 +185,7 @@ test_sec_to_min() {
 		local s2m
 		local bc
 
-		s2m="$(sec_to_min ${sec})"
+		s2m="$(sec_to_min "${sec}")"
 		bc="$(printf "%0.2f\n" "$(bc -l <<< "scale=2; ${sec}/60")")"
 
 		if [[ "${s2m}" != "${bc}" ]]; then
@@ -485,7 +485,7 @@ check_pairs () {
 			((result += 1))
 		fi
 	done
-	return ${result}
+	return "${result}"
 }
 
 check_progs_and_pairs () {
@@ -501,7 +501,7 @@ check_progs_and_pairs () {
 	if ! check_pairs _check_progs_and_pairs__pairs; then
 		((result += 1))
 	fi
-	return ${result}
+	return "${result}"
 }
 
 find_common_parent() {

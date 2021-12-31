@@ -6,6 +6,8 @@
 # Send bug reports to: @PACKAGE_BUGREPORT@
 #
 
+tdd_util_debug=''
+
 verbose_echo() {
 	local msg="${*}"
 
@@ -53,26 +55,35 @@ verbose_echo_test() {
 	echo
 }
 
+str_trim_space() {
+	local str_in=${1}
+	local str_out="${str_in}"
+
+	str_out="${str_out//$'\t'/ }"
+	str_out="${str_out//$'\n'/}"
+	str_out="${str_out//    / }"
+	str_out="${str_out//   / }"
+	str_out="${str_out//  / }"
+
+	# trim leading space.
+	str_out="${str_out#"${str_out%%[![:space:]]*}"}"
+
+	# trim trailing space.
+	str_out="${str_out%"${str_out##*[![:space:]]}"}"
+
+	if [[ ${tdd_util_debug} && "${str_in}" != "${str_out}" ]]; then
+		echo "${FUNCNAME[0]}: '${str_in}' => '${str_out}'" >&2
+	fi
+
+	echo "${str_out}"
+}
+
 clean_ws() {
-	local in="${*}"
-
-	shopt -s extglob
-
-	in="${in//+( )/ }"
-	in="${in# }"
-	in="${in% }"
-	echo -n "$in"
+	str_trim_space "${*}"
 }
 
 make_one_line_list() {
-	local in="${*}"
-
-	in="${in//$'\t'/ }"
-	in="${in//$'\n'/}"
-	in="${in# }"
-	in="${in% }"
-
-	echo -n "$in"
+	echo -n "$(str_trim_space "${*}")"
 }
 
 make_multi_line_list() {

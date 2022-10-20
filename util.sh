@@ -21,7 +21,7 @@ verbose_echo() {
 	fi
 }
 
-verbose_echo_test() {
+test_verbose_echo() {
 	unset verbose
 	verbose_echo 'verbose test: AAA'
 	verbose=''
@@ -100,21 +100,21 @@ substring_has() {
 	local string=${1}
 	local substring=${2}
 
-	[ -z "${string##*${substring}*}" ];
+	[ -z "${string##*"${substring}"*}" ];
 }
 
 substring_begins() {
 	local string=${1}
 	local substring=${2}
 
-	[ -z "${string##${substring}*}" ];
+	[ -z "${string##"${substring}"*}" ];
 }
 
 substring_ends() {
 	local string=${1}
 	local substring=${2}
 
-	[ -z "${string##*${substring}}" ];
+	[ -z "${string##*"${substring}"}" ];
 }
 
 sec_to_hour() {
@@ -249,8 +249,33 @@ test_parse_date() {
 	local day
 	local time
 
-	debug=1
-	parse_date "${script_name}-$(date +%Y.%m.%d-%H.%M.%S)" date day time
+	local -a str_array=(
+		"${script_name}-$(date +%Y.%m.%d-%H.%M.%S)"
+		"${script_name}-$(date +%Y.%m.%d-%H.%M.%S)-extra"
+	)
+
+	echo '-------------------------'
+
+	local i
+	for (( i = 0; i < ${#str_array[@]}; i++ )); do
+		local str="${str_array[i]}"
+
+		{
+			if [[ ${i} != '0' ]]; then
+				echo
+			fi
+
+			echo "${FUNCNAME[0]}: str-$(( i + 1 )): '${str}'"
+
+			parse_date "${str}" date day time
+
+			echo "${FUNCNAME[0]}: day:   '${day}'"
+			echo "${FUNCNAME[0]}: date:  '${date}'"
+			echo "${FUNCNAME[0]}: time:  '${time}'"
+		} >&2
+	done
+	echo '-------------------------'
+
 }
 
 parse_date_git() {
@@ -295,14 +320,39 @@ test_parse_date_git() {
 	local day
 	local month
 	local date
-	local time
 	local year
+	local time
 
-	debug=1
-	parse_date_git "Wed Jan 8 13:44:58 2020 -0800" day month date year time
-	parse_date_git "Sun Feb 28 11:26:06 2021 -0800" day month date year time
-	parse_date_git "$(date '+%a %b %e %X %Y %z')" day month date year time
-	parse_date_git "$(date '+%c %z')" day month date year time
+	local -a str_array=(
+		'Wed Jan 8 13:44:58 2020 -0800'
+		'Sun Feb 28 11:26:06 2021 -0800'
+		"$(date '+%a %b %e %H:%M:%S %Y %z')"	# Fri Oct 21 20:47:27 2022 -0700
+#		"$(date '+%c %z')"			# Fri 21 Oct 2022 08:47:27 PM PDT -0700
+	)
+
+	echo '-------------------------'
+
+	local i
+	for (( i = 0; i < ${#str_array[@]}; i++ )); do
+		local str="${str_array[i]}"
+
+		{
+			if [[ ${i} != '0' ]]; then
+				echo
+			fi
+
+			echo "${FUNCNAME[0]}: str-$(( i + 1 )): '${str}'"
+
+			parse_date_git "${str}" day month date year time
+
+			echo "${FUNCNAME[0]}: day:   '${day}'"
+			echo "${FUNCNAME[0]}: month: '${month}'"
+			echo "${FUNCNAME[0]}: date:  '${date}'"
+			echo "${FUNCNAME[0]}: year:  '${year}'"
+			echo "${FUNCNAME[0]}: time:  '${time}'"
+		} >&2
+	done
+	echo '-------------------------'
 }
 
 parse_date_iso_8601() {
@@ -345,9 +395,33 @@ test_parse_date_iso_8601() {
 	local day
 	local time
 
-	debug=1
-	parse_date_iso_8601 "2020-12-27 13:30:10 -0800" year month day time
-	parse_date_iso_8601 "2021-01-02 18:16:00 -0800" year month day time
+	local -a str_array=(
+		'2020-12-27 13:30:10 -0800'
+		'2021-01-02 18:16:00 -0700'
+	)
+
+	echo '-------------------------'
+
+	local i
+	for (( i = 0; i < ${#str_array[@]}; i++ )); do
+		local str="${str_array[i]}"
+
+		{
+			if [[ ${i} != '0' ]]; then
+				echo
+			fi
+
+			echo "${FUNCNAME[0]}: str-$(( i + 1 )): '${str}'"
+
+			parse_date_iso_8601 "${str}" year month day time
+
+			echo "${FUNCNAME[0]}: year:  '${year}'"
+			echo "${FUNCNAME[0]}: month: '${month}'"
+			echo "${FUNCNAME[0]}: day:   '${day}'"
+			echo "${FUNCNAME[0]}: time:  '${time}'"
+		} >&2
+	done
+	echo '-------------------------'
 }
 
 file_size_bytes() {
@@ -546,7 +620,7 @@ relative_path_2() {
 	local target="${2}"
 	local root="${3}"
 
-	base="${base##${root}}"
+	base="${base##"${root}"}"
 	base="${base%%/}"
 	base=${base%/*}
 	target="${target%%/}"
@@ -568,7 +642,7 @@ relative_path_2() {
 		base=${base%/*}
 	done
 
-	echo "${back}${target##${base}/}"
+	echo "${back}${target##"${base}"/}"
 }
 
 relative_path() {
@@ -576,7 +650,7 @@ relative_path() {
 	local target="${2}"
 	local root="${3}"
 
-	base="${base##${root}}"
+	base="${base##"${root}"}"
 	base="${base%%/}"
 	base=${base%/*}
 	target="${target%%/}"
@@ -593,7 +667,7 @@ relative_path() {
 		base=${base%/*}
 	done
 
-	echo "${back}${target##${base}/}"
+	echo "${back}${target##"${base}"/}"
 }
 
 copy_file() {
@@ -625,7 +699,7 @@ get_user_home() {
 	echo "${result}" | cut -d ':' -f 6
 }
 
-known_arches="arm32 arm64 amd64 ppc32 ppc64 ppc64le"
+export known_arches="arm32 arm64 amd64 ppc32 ppc64 ppc64le"
 
 get_arch() {
 	local a=${1}
@@ -699,6 +773,8 @@ is_ip_addr() {
 	echo "found ip: '${host}'"
 	return 0
 }
+
+# ip a | grep 'inet .* tun0' | grep -E --only-matching '([[:digit:]]{1,3}.){3}[[:digit:]]{1,3}'
 
 find_addr() {
 	local -n _find_addr__addr=${1}
@@ -862,12 +938,12 @@ get_container_id() {
 	echo "${container_id}"
 }
 
-ansi_reset='\e[0m'
-ansi_red='\e[1;31m'
-ansi_green='\e[0;32m'
-ansi_yellow='\e[1;33m'
-ansi_blue='\e[0;34m'
-ansi_teal='\e[0;36m'
+export ansi_reset='\e[0m'
+export ansi_red='\e[1;31m'
+export ansi_green='\e[0;32m'
+export ansi_yellow='\e[1;33m'
+export ansi_blue='\e[0;34m'
+export ansi_teal='\e[0;36m'
 
 if [[ ${PS4} == '+ ' ]]; then
 	if [[ ${JENKINS_URL} ]]; then

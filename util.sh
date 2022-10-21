@@ -22,37 +22,41 @@ verbose_echo() {
 }
 
 test_verbose_echo() {
+	echo '-----------------'
+
 	unset verbose
-	verbose_echo 'verbose test: AAA'
+	verbose_echo "${FUNCNAME[0]}: verbose AAA"
 	verbose=''
-	verbose_echo 'verbose test: BBB'
+	verbose_echo "${FUNCNAME[0]}: verbose BBB"
 	verbose=n
-	verbose_echo 'verbose test: CCC'
+	verbose_echo "${FUNCNAME[0]}: verbose CCC"
 	verbose=y
-	verbose_echo 'verbose test: DDD'
+	verbose_echo "${FUNCNAME[0]}: verbose DDD"
 	verbose=0
-	verbose_echo 'verbose test: EEE'
+	verbose_echo "${FUNCNAME[0]}: verbose EEE"
 	verbose=1
-	verbose_echo 'verbose test: FFF'
+	verbose_echo "${FUNCNAME[0]}: verbose FFF"
 	unset verbose
-	echo "verbose, want: DDD, FFF"
-	echo
+	echo "${FUNCNAME[0]}: Want verbose DDD, FFF"
+
+	echo '-----------------'
 
 	unset quiet
-	verbose_echo 'quiet test: GGG'
+	verbose_echo "${FUNCNAME[0]}: quiet GGG"
 	quiet=''
-	verbose_echo 'quiet test: HHH'
+	verbose_echo "${FUNCNAME[0]}: quiet HHH"
 	quiet=n
-	verbose_echo 'quiet test: III'
+	verbose_echo "${FUNCNAME[0]}: quiet III"
 	quiet=y
-	verbose_echo 'quiet test: JJJ'
+	verbose_echo "${FUNCNAME[0]}: quiet JJJ"
 	quiet=0
-	verbose_echo 'quiet test: KKK'
+	verbose_echo "${FUNCNAME[0]}: quiet KKK"
 	quiet=1
-	verbose_echo 'quiet test: LLL'
+	verbose_echo "${FUNCNAME[0]}: quiet LLL"
 	unset quiet
-	echo "quiet, want: III, KKK"
-	echo
+	echo "${FUNCNAME[0]}: Want quiet III, KKK"
+
+	echo '-----------------'
 }
 
 str_trim_space() {
@@ -142,6 +146,8 @@ test_sec_to_hour() {
 
 	local failed=''
 
+	echo '-------------------------'
+
 	for (( sec = start; sec <= end; sec += enc )); do
 		local s2h
 		local bc
@@ -157,14 +163,12 @@ test_sec_to_hour() {
 		fi
 	done
 
-	trap - EXIT
 	if [[ ! ${failed} ]]; then
-		echo "test_sec_to_hour: Success."
-		exit 0
+		echo "${FUNCNAME[0]}: Success."
 	else
-		echo "test_sec_to_hour: Failed."
-		exit 1
+		echo "${FUNCNAME[0]}: Failed."
 	fi
+	echo '-------------------------'
 }
 
 sec_to_min() {
@@ -192,6 +196,8 @@ test_sec_to_min() {
 
 	local failed=''
 
+	echo '-------------------------'
+
 	for (( sec = start; sec <= end; sec += enc )); do
 		local s2m
 		local bc
@@ -207,14 +213,12 @@ test_sec_to_min() {
 		fi
 	done
 
-	trap - EXIT
 	if [[ ! ${failed} ]]; then
-		echo "test_sec_to_min: Success."
-		exit 0
+		echo "${FUNCNAME[0]}: Success."
 	else
-		echo "test_sec_to_min: Failed."
-		exit 1
+		echo "${FUNCNAME[0]}: Failed."
 	fi
+	echo '-------------------------'
 }
 
 parse_date() {

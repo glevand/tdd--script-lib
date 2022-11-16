@@ -768,7 +768,7 @@ sudo_append() {
 
 is_ip_addr() {
 	local host=${1}
-	local regex_ip="[[:digit:]]{1,3}\.([[:digit:]]{1,3}/.){3}"
+	local regex_ip="([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}"
 
 	if [[ "${host}" =~ ${regex_ip} ]]; then
 		echo "found name: '${host}'"
